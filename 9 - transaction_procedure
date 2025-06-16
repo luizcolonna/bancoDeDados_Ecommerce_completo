@@ -1,0 +1,37 @@
+DELIMITER $$
+
+CREATE PROCEDURE sp_update_client(
+    IN p_idClient INT,
+    IN p_Fname VARCHAR(50),
+    IN p_cpf CHAR(11)
+)
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SELECT 'Erro na atualização do cliente, transação revertida.' AS msg;
+    END;
+
+    START TRANSACTION;
+
+    -- Savepoint para rollback parcial se precisar
+    SAVEPOINT before_update;
+
+    -- Verifica se existe outro cliente com o mesmo CPF
+    IF EXISTS (SELECT 1 FROM clients WHERE cpf = p_cpf AND idClient <> p_idClient) THEN
+        -- CPF duplicado, rollback parcial
+        ROLLBACK TO before_update;
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'CPF já cadastrado para outro cliente';
+    ELSE
+        -- Atualiza dados do cliente
+        UPDATE clients SET Fname = p_Fname, cpf = p_cpf WHERE idClient = p_idClient;
+    END IF;
+
+    COMMIT;
+END$$
+
+DELIMITER ;
+
+
+CALL sp_update_client(1, 'Paulo', '12345678901');
+
