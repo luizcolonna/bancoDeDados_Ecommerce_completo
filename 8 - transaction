@@ -1,0 +1,23 @@
+-- Desabilita autocommit para iniciar transação manual
+SET autocommit = 0;
+
+START TRANSACTION;
+
+-- Exemplo de SELECT
+SELECT * FROM clients WHERE idClient = 1;
+
+-- Exemplo de UPDATE
+UPDATE clients SET address = 'Rua Nova, 123' WHERE idClient = 1;
+
+-- Exemplo de INSERT
+INSERT INTO clients (Fname, Minit, Lname, cpf, address)
+VALUES ('Paulo', 'P', 'Silva', '12345678901', 'Rua das Flores, 456');
+
+-- Exemplo de DELETE (comentado para evitar exclusão acidental)
+-- DELETE FROM clients WHERE idClient = 10;
+
+-- Confirma alterações
+COMMIT;
+
+-- Reabilita autocommit
+SET autocommit = 1;
